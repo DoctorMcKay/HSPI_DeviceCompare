@@ -110,7 +110,11 @@ namespace HSPI_DeviceCompare
 			}
 
 			sb.Append(dropList.Build());
-			sb.Append("<br />And it is ");
+			if (!currentUiIsCondition) {
+				sb.Append("<br />And it is ");
+			} else {
+				sb.Append(" is ");
+			}
 
 			dropList = new clsJQuery.jqDropList("CompOperator" + unique, "events", true);
 			dropList.AddItem("less than", ((int) TriggerComp.LessThan).ToString(), trig.Comparison == TriggerComp.LessThan);
@@ -123,6 +127,11 @@ namespace HSPI_DeviceCompare
 				trig.Comparison == TriggerComp.GreaterThanOrEqual);
 			dropList.AddItem("not equal to", ((int) TriggerComp.NotEqual).ToString(), trig.Comparison == TriggerComp.NotEqual);
 			sb.Append(dropList.Build());
+
+			if (currentUiIsCondition) {
+				sb.Append("<br />");
+			}
+			
 			sb.Append(" the value of: ");
 
 			dropList = new clsJQuery.jqDropList("DeviceRight" + unique, "events", true);
