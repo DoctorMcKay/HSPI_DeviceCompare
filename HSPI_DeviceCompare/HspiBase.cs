@@ -279,12 +279,16 @@ namespace HSPI_DeviceCompare
 		#endregion
 		
 		#region HS3 trigger methods and stuff
+		
+		protected bool Condition { get; private set; }
 
-		public virtual bool get_Condition(IPlugInAPI.strTrigActInfo trigInfo) {
-			return false;
+		public bool get_Condition(IPlugInAPI.strTrigActInfo trigInfo) {
+			return Condition;
 		}
 
-		public virtual void set_Condition(IPlugInAPI.strTrigActInfo trigInfo, bool value) {}
+		public void set_Condition(IPlugInAPI.strTrigActInfo trigInfo, bool value) {
+			Condition = value;
+		}
 
 		/// <summary>
 		/// Returns whether the given trigger can also be used as a condition.
@@ -494,7 +498,7 @@ namespace HSPI_DeviceCompare
 		public HomeSeerAPI.IHSApplication hs;
 		public HomeSeerAPI.IAppCallbackAPI callbacks;
 
-		public virtual bool Connected {
+		public bool Connected {
 			get {
 				return hsClient.CommunicationState ==
 				       HSCF.Communication.Scs.Communication.CommunicationStates.Connected;
@@ -503,7 +507,7 @@ namespace HSPI_DeviceCompare
 		
 		public bool Shutdown { get; protected set; }
 
-		public virtual void Connect(string serverAddress, int serverPort) {
+		public void Connect(string serverAddress, int serverPort) {
 			hsClient = ScsServiceClientBuilder.CreateClient<IHSApplication>(
 				new ScsTcpEndPoint(serverAddress, serverPort), this);
 			hsClient.Connect();

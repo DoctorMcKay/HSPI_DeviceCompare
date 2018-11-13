@@ -13,8 +13,7 @@ namespace HSPI_DeviceCompare
 	public class HSPI : HspiBase
 	{
 		public const string PLUGIN_NAME = "DeviceCompare";
-
-		private bool currentUiIsCondition = false;
+		
 		private List<DeviceData> devices;
 		
 		public HSPI() {
@@ -24,7 +23,7 @@ namespace HSPI_DeviceCompare
 		}
 
 		public override string InitIO(string port) {
-			Program.WriteLog("verbose", "InitIO");
+			Program.WriteLog(LogType.Verbose, "InitIO");
 
 			callbacks.RegisterEventCB(Enums.HSEvent.CONFIG_CHANGE, Name, InstanceFriendlyName());
 			callbacks.RegisterEventCB(Enums.HSEvent.VALUE_SET, Name, InstanceFriendlyName());
@@ -35,7 +34,7 @@ namespace HSPI_DeviceCompare
 		}
 
 		public override void HSEvent(Enums.HSEvent eventType, object[] parameters) {
-			Program.WriteLog("verbose", "HSEvent triggered " + eventType);
+			Program.WriteLog(LogType.Debug, "HSEvent triggered " + eventType);
 
 			switch (eventType) {
 				case Enums.HSEvent.CONFIG_CHANGE:
@@ -59,7 +58,7 @@ namespace HSPI_DeviceCompare
 							double valueLeft = hs.DeviceValueEx(trig.Data.DevRefLeft);
 							double valueRight = hs.DeviceValueEx(trig.Data.DevRefRight);
 							if (trig.Data.EvaluateTrigger(eventType, valueLeft, valueRight)) {
-								Program.WriteLog("info",
+								Program.WriteLog(LogType.Info,
 									"Triggering event " + trig.TrigInfo.evRef + " because " + trig.Data.Type + " and " +
 									valueLeft + " " + trig.Data.Comparison + " " + valueRight);
 								callbacks.TriggerFire(Name, trig.TrigInfo);
@@ -83,18 +82,14 @@ namespace HSPI_DeviceCompare
 			return "A Device's Value Compares With Another...";
 		}
 
-		public override void set_Condition(IPlugInAPI.strTrigActInfo trigInfo, bool val) {
-			currentUiIsCondition = val;
-		}
-
 		public override string TriggerBuildUI(string unique, IPlugInAPI.strTrigActInfo trigInfo) {
 			StringBuilder sb = new StringBuilder();
 			TriggerData trig = TriggerData.Unserialize(trigInfo.DataIn);
 			clsJQuery.jqDropList dropList;
 			
-			Program.WriteLog("console", "Building UI for " + trig);
+			Program.WriteLog(LogType.Console, "Building UI for " + trig);
 
-			if (!currentUiIsCondition) {
+			if (!Condition) {
 				dropList = new clsJQuery.jqDropList("TrigType" + unique, "events", true);
 				dropList.AddItem("This device's value was set:", ((byte) TriggerType.DeviceValueSet).ToString(),
 					trig.Type == TriggerType.DeviceValueSet);
@@ -110,7 +105,7 @@ namespace HSPI_DeviceCompare
 			}
 
 			sb.Append(dropList.Build());
-			if (!currentUiIsCondition) {
+			if (!Condition) {
 				sb.Append("<br />And it is ");
 			} else {
 				sb.Append(" is ");
@@ -128,7 +123,7 @@ namespace HSPI_DeviceCompare
 			dropList.AddItem("not equal to", ((int) TriggerComp.NotEqual).ToString(), trig.Comparison == TriggerComp.NotEqual);
 			sb.Append(dropList.Build());
 
-			if (currentUiIsCondition) {
+			if (Condition) {
 				sb.Append("<br />");
 			}
 			
@@ -157,7 +152,7 @@ namespace HSPI_DeviceCompare
 				string[] parts = key.Split('_');
 				if (parts.Length > 1) {
 					postData.Add(parts[0], postData.Get(key));
-					Program.WriteLog("console", parts[0] + " set to " + postData.Get(key));
+					Program.WriteLog(LogType.Console, parts[0] + " set to " + postData.Get(key));
 				}
 			}
 			
@@ -182,7 +177,7 @@ namespace HSPI_DeviceCompare
 				trig.Comparison = (TriggerComp) tempInt;
 			}
 
-			Program.WriteLog("console", "Returning " + trig);
+			Program.WriteLog(LogType.Console, "Returning " + trig);
 			ret.DataOut = trig.Serialize();
 			return ret;
 		}
@@ -193,7 +188,7 @@ namespace HSPI_DeviceCompare
 			}
 			
 			TriggerData trig = TriggerData.Unserialize(trigInfo.DataIn);
-			Program.WriteLog("console", "Formatting UI for " + trig);
+			Program.WriteLog(LogType.Console, "Formatting UI for " + trig);
 			StringBuilder sb = new StringBuilder();
 
 			DeviceClass devLeft = (DeviceClass) hs.GetDeviceByRef(trig.DevRefLeft);
@@ -204,7 +199,7 @@ namespace HSPI_DeviceCompare
 			sb.Append(devLeft.get_Location2(hs) + " " + devLeft.get_Location(hs) + " " + devLeft.get_Name(hs));
 			sb.Append("</span> ");
 
-			if (!currentUiIsCondition) {
+			if (!Condition) {
 				sb.Append("<span class=\"event_Txt_Selection\">");
 				
 				switch (trig.Type) {
@@ -268,7 +263,7 @@ namespace HSPI_DeviceCompare
 			double valueLeft = hs.DeviceValueEx(trig.DevRefLeft);
 			double valueRight = hs.DeviceValueEx(trig.DevRefRight);
 			if (trig.EvaluateCondition(valueLeft, valueRight)) {
-				Program.WriteLog("info",
+				Program.WriteLog(LogType.Info,
 					"Passing condition for event " + trigInfo.evRef + " because " + valueLeft + " " + trig.Comparison +
 					" " + valueRight);
 				return true;
@@ -278,7 +273,7 @@ namespace HSPI_DeviceCompare
 		}
 
 		private void cacheDeviceList() {
-			Program.WriteLog("debug", "Caching device list");
+			Program.WriteLog(LogType.Debug, "Caching device list");
 			List<DeviceData> devices = new List<DeviceData>();
 			clsDeviceEnumeration enumerator = (clsDeviceEnumeration) hs.GetDeviceEnumerator();
 			do {
@@ -291,7 +286,7 @@ namespace HSPI_DeviceCompare
 				}
 			} while (!enumerator.Finished);
 
-			Program.WriteLog("debug", "Device list cached successfully");
+			Program.WriteLog(LogType.Debug, "Device list cached successfully");
 			this.devices = devices.OrderBy(d => d.Name).ToList();
 		}
 
