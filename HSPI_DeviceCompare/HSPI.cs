@@ -15,6 +15,8 @@ namespace HSPI_DeviceCompare
 		public const string PLUGIN_NAME = "DeviceCompare";
 		
 		private List<DeviceData> devices;
+		private List<TriggerEntry> triggerCache = null;
+		private long lastTriggerCacheTime = 0;
 		
 		public HSPI() {
 			Name = PLUGIN_NAME;
@@ -295,6 +297,11 @@ namespace HSPI_DeviceCompare
 		}
 
 		private List<TriggerEntry> getTriggerList() {
+			if (triggerCache != null && Time.UnixTimeSeconds() - lastTriggerCacheTime < 30) {
+				return triggerCache;
+			}
+			
+			long startTime = Time.UnixTimeMilliseconds();
 			List<TriggerEntry> list = new List<TriggerEntry>();
 
 			foreach (IPlugInAPI.strTrigActInfo trig in callbacks.TriggerMatches(Name, 1, -1)) {
@@ -306,7 +313,11 @@ namespace HSPI_DeviceCompare
 					});
 				}
 			}
+			
+			Program.WriteLog(LogType.Debug, "Refreshed trigger list in " + (Time.UnixTimeMilliseconds() - startTime) + " ms");
 
+			lastTriggerCacheTime = Time.UnixTimeSeconds();
+			triggerCache = list;			
 			return list;
 		}
 	}
