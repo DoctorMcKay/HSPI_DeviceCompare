@@ -34,12 +34,11 @@ namespace HSPI_DeviceCompare
 		}
 
 		public override void HSEvent(Enums.HSEvent eventType, object[] parameters) {
-			Program.WriteLog(LogType.Debug, "HSEvent triggered " + eventType);
-
 			switch (eventType) {
 				case Enums.HSEvent.CONFIG_CHANGE:
 					int type = (int) parameters[1];
 					int dac = (int) parameters[4];
+					Program.WriteLog(LogType.Debug, "HSEvent triggered " + eventType + " type " + type + " DAC " + dac);
 					if (type == 0 && (dac == 1 || dac == 2)) {
 						// Device was added or deleted
 						cacheDeviceList();
@@ -50,6 +49,7 @@ namespace HSPI_DeviceCompare
 				case Enums.HSEvent.VALUE_SET:
 				case Enums.HSEvent.VALUE_CHANGE:
 					int devRef = (int) parameters[4];
+					Program.WriteLog(LogType.Debug, "HSEvent triggered " + eventType + " for dev ref " + devRef);
 					
 					// Do any of our triggers reference this device?
 					foreach (TriggerEntry trig in getTriggerList()) {
@@ -66,6 +66,10 @@ namespace HSPI_DeviceCompare
 						}
 					}
 
+					break;
+				
+				default:
+					Program.WriteLog(LogType.Debug, "HSEvent triggered " + eventType);
 					break;
 			}
 		}
