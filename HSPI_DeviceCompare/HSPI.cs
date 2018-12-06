@@ -31,8 +31,7 @@ namespace HSPI_DeviceCompare
 			callbacks.RegisterEventCB(Enums.HSEvent.VALUE_SET, Name, InstanceFriendlyName());
 			callbacks.RegisterEventCB(Enums.HSEvent.VALUE_CHANGE, Name, InstanceFriendlyName());
 			cacheDeviceList();
-
-			Program.WriteLog(LogType.Info, Name + " started successfully");
+			
 			return "";
 		}
 
