@@ -5,16 +5,17 @@ on: [push]
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v1
     
-    - name: Setup MSBuild.exe
-      uses: warrenbuckley/Setup-MSBuild@v1
+    - name: Setup Dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 4.5.2
       
-    - name: MSBuild
-      working-directory: src
+    - name: Build with dotnet
       run: |
-        msbuild /p:Configuration=Debug %GITHUB_WORKSPACE%
-        msbuild /p:Configuration=Release %GITHUB_WORKSPACE%
+        dotnet build --configuration Debug
+        dotnet build --configuration Release
