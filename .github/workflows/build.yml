@@ -23,3 +23,15 @@ jobs:
       run: |
         msbuild /p:Configuration=Debug HSPI_DeviceCompare.sln
         msbuild /p:Configuration=Release HSPI_DeviceCompare.sln
+    
+    - name: Upload release build
+      uses: actions/upload-artifact@v1
+      with:
+        name: Release
+        path: HSPI_DeviceCompare\bin\Release\HSPI_DeviceCompare.exe
+    
+    - name: Upload debug build
+      uses: actions/upload-artifact@v1
+      with:
+        name: Debug
+        path: HSPI_DeviceCompare\bin\Debug\HSPI_DeviceCompare.exe
