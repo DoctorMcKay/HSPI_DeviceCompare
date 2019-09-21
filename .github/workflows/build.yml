@@ -5,17 +5,15 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
     - uses: actions/checkout@v1
     
-    - name: Setup Dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 4.5.1
+    - name: Setup msbuild
+      uses: warrenbuckley/Setup-MSBuild@v1
       
-    - name: Build with dotnet
+    - name: MSBuild
       run: |
-        dotnet build --configuration Debug
-        dotnet build --configuration Release
+        msbuild /p:Configuration=Debug HSPI_DeviceCompare.sln
+        msbuild /p:Configuration=Release HSPI_DeviceCompare.sln
