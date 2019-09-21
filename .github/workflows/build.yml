@@ -16,5 +16,5 @@ jobs:
     - name: MSBuild
       working-directory: src
       run: |
-        msbuild /p:Configuration=Debug HSPI_DeviceCompare.sln
-        msbuild /p:Configuration=Release HSPI_DeviceCompare.sln
+        msbuild /p:Configuration=Debug %GITHUB_WORKSPACE%\HSPI_DeviceCompare.sln
+        msbuild /p:Configuration=Release %GITHUB_WORKSPACE%\HSPI_DeviceCompare.sln
