@@ -23,15 +23,17 @@ jobs:
       run: |
         msbuild /p:Configuration=Debug HSPI_DeviceCompare.sln
         msbuild /p:Configuration=Release HSPI_DeviceCompare.sln
+        
+    - name: Stage artifacts
+      run: |
+        mkdir artifacts
+        cp HSPI_DeviceCompare\bin\Release\HSPI_DeviceCompare.exe artifacts\HSPI_DeviceCompare.exe
+        mkdir "artifacts\Debug Build"
+        cp HSPI_DeviceCompare\bin\Debug\HSPI_DeviceCompare.exe "artifacts\Debug Build\HSPI_DeviceCompare.exe"
+        echo %GITHUB_SHA% > artifacts\CommitHash.txt
     
-    - name: Upload release build
+    - name: Upload artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: Release
-        path: HSPI_DeviceCompare\bin\Release\HSPI_DeviceCompare.exe
-    
-    - name: Upload debug build
-      uses: actions/upload-artifact@v1
-      with:
-        name: Debug
-        path: HSPI_DeviceCompare\bin\Debug\HSPI_DeviceCompare.exe
+        name: Plugin
+        path: artifacts
